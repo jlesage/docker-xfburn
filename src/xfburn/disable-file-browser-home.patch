@@ -1,0 +1,56 @@
+--- a/xfburn/xfburn-fs-browser.c	2024-08-31 09:23:23.564510011 -0400
++++ b/xfburn/xfburn-fs-browser.c	2024-08-31 09:24:09.049186627 -0400
+@@ -245,7 +245,11 @@
+ xfburn_fs_browser_refresh (XfburnFsBrowser * browser)
+ {
+   GtkTreeModel *model;
++#ifdef HOME_DIR_SUPPORT
+   GtkTreeIter iter_initial, iter_home, iter_root;
++#else
++  GtkTreeIter iter_initial, iter_root;
++#endif
+   int x, y;
+   gchar *text;
+   GdkScreen *screen;
+@@ -280,6 +284,7 @@
+   }
+ 
+ 
++#ifdef HOME_DIR_SUPPORT
+   /* load the user's home dir */
+   text = g_strdup_printf (_("%s's home"), g_get_user_name ());
+ 
+@@ -296,8 +301,13 @@
+   g_free (text);
+ 
+   load_directory_in_browser (browser, xfce_get_homedir (), &iter_home);
++#endif
+ 
+   /* load the fs root */
++#ifndef HOME_DIR_SUPPORT
++  screen = gtk_widget_get_screen (GTK_WIDGET (browser));
++  icon_theme = gtk_icon_theme_get_for_screen (screen);
++#endif
+   icon = gtk_icon_theme_load_icon (icon_theme, "drive-harddisk", x, 0, NULL);
+   gtk_tree_store_append (GTK_TREE_STORE (model), &iter_root, NULL);
+   gtk_tree_store_set (GTK_TREE_STORE (model), &iter_root,
+@@ -317,11 +327,19 @@
+     /* expand the initial dir row */
+     path = gtk_tree_model_get_path (model, &iter_initial);
+   } else {
++#ifdef HOME_DIR_SUPPORT
+     /* set cursor on home dir row */
+     gtk_tree_selection_select_iter (selection, &iter_home);
+ 
+     /* expand the home dir row */
+     path = gtk_tree_model_get_path (model, &iter_home);
++#else
++    /* set cursor on root dir row */
++    gtk_tree_selection_select_iter (selection, &iter_root);
++
++    /* expand the root dir row */
++    path = gtk_tree_model_get_path (model, &iter_root);
++#endif
+   }
+   gtk_tree_view_expand_row (GTK_TREE_VIEW (browser), path, FALSE);
+   gtk_tree_path_free (path);

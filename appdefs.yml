@@ -1,0 +1,73 @@
+---
+
+#
+# Definitions for MediaInfo docker container.
+#
+# This file is used as data source to generate README.md and unRAID template files
+# from Jinja2 templates.
+#
+
+app:
+  id: 29
+  name: xfburn
+  friendly_name: Xfburn
+  gui_type: x11
+  base_os: alpine
+  project:
+    description: |-
+      Xfburn is an easy to use burning software. It uses libburn and libisofs as a
+      backend, in difference to most other GUI programs at the moment.
+    url: https://docs.xfce.org/apps/xfburn/start
+  unraid:
+    #support_url: https://forums.unraid.net/topic/XXXXX-support-xfburn/
+    category: "MediaApp:Other Tools:"
+  documentation:
+    sections:
+      - title: Access to Optical Drive(s)
+        level: 2
+        content: |-
+          By default, a Docker container doesn't have access to host's devices.  However,
+          access to one or more device can be granted with the `--device DEV` parameter.
+
+          Optical drives usually have `/dev/srX` as device.  For example, the first drive
+          is `/dev/sr0`, the second `/dev/sr1`, and so on.  To provide {{ app.friendly_name }}
+          access to the first drive, this parameter is needed:
+          ```
+          --device /dev/sr0
+          ```
+
+          To easily find devices associated to optical drives, start the container and
+          look at its log for messages similar to these ones:
+          ```
+          ...
+          [cont-init.d] 54-check-optical-drive.sh: executing...
+          [cont-init.d] 54-check-optical-drive.sh: looking for usable optical drives...
+          [cont-init.d] 54-check-optical-drive.sh: found optical drive /dev/sr0, but it is not usable because is not exposed to the container.
+          [cont-init.d] 54-check-optical-drive.sh: no usable optical drive found.
+          [cont-init.d] 54-check-optical-drive.sh: exited 0.
+          ...
+          ```
+  changelog:
+    - version: 24.08.1
+      date: 2024-08-31
+      changes:
+        - 'Initial release.'
+
+container:
+  storage_permissions: ro
+
+  # Environment variables.
+  environment_variables: []
+
+  # Volumes
+  volumes: []
+
+  # Network ports
+  ports: []
+
+  # Devices
+  devices:
+    - path: /dev/sr0
+      description: >-
+        This is the Linux device file representing the optical drive.
+      include_in_quick_start: true
