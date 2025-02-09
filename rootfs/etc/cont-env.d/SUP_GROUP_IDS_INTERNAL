@@ -1,28 +1,28 @@
 #!/bin/sh
+#
+# Get the supplementary group ID(s) needed to access optical drive(s).  These
+# will be added to the ones provided by $SUP_GROUP_IDS.
+#
 
 set -e # Exit immediately if a command exits with a non-zero status.
 set -u # Treat unset variables as an error.
 
 GRPS=$(mktemp)
 
-# Get supplementary group(s) associated to optical drive(s).
-if true; then
-    DRIVES_INFO="$(mktemp)"
-    lsscsi -g -k | grep -w "cd/dvd" | tr -s ' ' > "$DRIVES_INFO"
+lsscsi -k | grep -w "cd/dvd" | tr -s ' ' | while read -r DRV
+do
+    SR_DEV="$(echo "$DRV" | rev | awk '{print $1}' | rev)"
 
-    while read -r DRV; do
-        DRV_DEV="$(echo "$DRV" | rev | sed -e 's/^[ \t]*//' | cut -d' ' -f2 | rev)"
-        if [ -e "$DRV_DEV" ]; then
-            # Save the associated group.
-            G="$(stat -c "%g" "$DRV_DEV")"
-            echo "$G" >> "$GRPS"
-        fi
-    done < "$DRIVES_INFO"
-    rm "$DRIVES_INFO"
-fi
+    # Save the associated group.
+    if [ -e "$SR_DEV" ]; then
+        # Save the associated group.
+        G="$(stat -c "%g" "$SR_DEV")"
+        [ "$G" -eq 0 ] || echo "$G" >> "$GRPS"
+    fi
+done
 
 # Print supplementary group IDs.
-if [ "$(cat "$GRPS")" != "" ]; then
+if [ -n "$(cat "$GRPS")" ]; then
     cat "$GRPS" | grep -v '^$' | grep -v '^0$' | sort -nub | tr '\n' ','
     rm "$GRPS"
 else
