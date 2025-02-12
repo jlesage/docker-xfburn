@@ -40,6 +40,23 @@ permissions_ok() {
     return 1
 }
 
+write_access_test() {
+    [ -e "$1" ] || return 1
+    output="$(2>&1 >> "$1")"
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        if ! echo "$output" | grep -iq "permission denied"; then
+            # We just want error related to the lack of write permission.
+            rc=0
+        fi
+    fi
+    return $rc
+}
+
+using_initial_user_namespace() {
+    [ "$(cat /proc/self/uid_map | xargs)" = "0 0 4294967295" ]
+}
+
 echo "looking for usable optical drives..."
 
 USABLE_DRIVES_FOUND="$(mktemp)"
@@ -60,10 +77,17 @@ do
         if [ -e "$SR_DEV" ]; then
             echo "  [ OK ]   the host device $SR_DEV is exposed to the container."
             if permissions_ok "$SR_DEV"; then
-                echo 1 > "$USABLE_DRIVES_FOUND"
-                echo "  [ OK ]   the host device $SR_DEV has proper permissions."
+                echo "  [ OK ]   the device $SR_DEV has proper permissions."
+                is-bool-val-false "${CONTAINER_DEBUG:-0}" || echo "           permissions: $(ls -l "$SR_DEV" | awk '{print $1,$3,$4}')"
+                if write_access_test "$SR_DEV"; then
+                    echo 1 > "$USABLE_DRIVES_FOUND"
+                    echo "  [ OK ]   the container can write to device $SR_DEV."
+                else
+                    echo "  [ ERR ]  the container cannot write to device $SR_DEV."
+                    using_initial_user_namespace || echo "           problem might be caused by improper user namespace configuration."
+                fi
             else
-                echo "  [ ERR ]  the host device $SR_DEV does not have proper permissions."
+                echo "  [ ERR ]  the device $SR_DEV does not have proper permissions."
                 is-bool-val-false "${CONTAINER_DEBUG:-0}" || echo "           permissions: $(ls -l "$SR_DEV" | awk '{print $1,$3,$4}')"
             fi
         else
