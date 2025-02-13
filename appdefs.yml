@@ -74,6 +74,10 @@ app:
           [4:0:0:0]    cd/dvd  hp HLDS  DVDRW  GUD1N     LD02  /dev/sr0
           ```
   changelog:
+    - version: 25.02.2
+      date: 2025-02-12
+      changes:
+        - 'Report the case where an optical drive cannot be used because of an improper user namespace configuration.'
     - version: 25.02.1
       date: 2025-02-09
       changes:
