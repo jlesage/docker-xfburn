@@ -48,7 +48,7 @@ RUN add-pkg \
         adwaita-icon-theme \
         # A font is needed.
         font-croscore \
-        # For optical drive listing:
+        # For optical drive listing.
         lsscsi
 
 # Generate and install favicons.

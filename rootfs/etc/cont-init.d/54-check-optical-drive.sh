@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # Find and report issues with detected optical drives that would prevent them
-# to be used by MakeMKV.
+# from being used by the application.
 #
 
 set -e # Exit immediately if a command exits with a non-zero status.
