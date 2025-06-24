@@ -8,10 +8,10 @@
 ARG DOCKER_IMAGE_VERSION=
 
 # Define software versions.
-ARG XFBURN_VERSION=0.7.2
+ARG XFBURN_VERSION=0.8.0
 
 # Define software download URLs.
-ARG XFBURN_URL=https://archive.xfce.org/src/apps/xfburn/0.7/xfburn-${XFBURN_VERSION}.tar.bz2
+ARG XFBURN_URL=https://archive.xfce.org/src/apps/xfburn/0.8/xfburn-${XFBURN_VERSION}.tar.bz2
 
 # Get Dockerfile cross-compilation helpers.
 FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
