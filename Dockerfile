@@ -26,7 +26,7 @@ RUN /build/build.sh "$XFBURN_URL"
 RUN xx-verify /tmp/xfburn-install/usr/bin/xfburn
 
 # Pull base image.
-FROM jlesage/baseimage-gui:alpine-3.20-v4.9.0
+FROM jlesage/baseimage-gui:alpine-3.20-v4.10.0
 
 ARG XFBURN_VERSION
 ARG DOCKER_IMAGE_VERSION
