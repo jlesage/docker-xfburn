@@ -12,7 +12,8 @@ This is a Docker container for [Xfburn](https://docs.xfce.org/apps/xfburn/start)
 The graphical user interface (GUI) of the application can be accessed through a
 modern web browser, requiring no installation or configuration on the client
 
-> This Docker container is entirely unofficial and not made by the creators of Xfburn.
+> This Docker container is entirely unofficial and not made by the creators of
+> Xfburn.
 
 ---
 
